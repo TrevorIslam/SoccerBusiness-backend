@@ -1,5 +1,6 @@
 import express from 'express';
 import supabase from './supabaseClient.js';
+import { authenticateToken } from './middleware/auth.js';
 
 const router = express.Router();
 
@@ -65,38 +66,6 @@ router.post('/signin', async (req, res) => {
         });
     }
 });
-
-// Simple middleware to verify tokens
-const authenticateToken = async (req, res, next) => {
-    try {
-        // Get token from Authorization header
-        const authHeader = req.headers['authorization'];
-        const token = authHeader?.split(' ')[1];
-
-        if (!token) {
-            return res.status(401).json({ 
-                message: 'Access denied. No token provided.' 
-            });
-        }
-
-        // Verify token with Supabase
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-
-        if (error) {
-            return res.status(401).json({ 
-                message: 'Invalid or expired token' 
-            });
-        }
-
-        req.user = user;
-        next();
-
-    } catch (error) {
-        res.status(401).json({ 
-            message: 'Invalid token' 
-        });
-    }
-};
 
 // **Sign Out**
 router.post('/signout', async (req, res) => {
