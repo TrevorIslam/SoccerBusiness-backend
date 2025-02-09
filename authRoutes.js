@@ -49,13 +49,15 @@ router.post('/signin', async (req, res) => {
 
         // Extract the session data
         const { session } = data;
-        
-        // Send back just the token and basic user info
+    
+
         res.json({
-            token: session.access_token,
+            access_token: session.access_token,
+            expires_at: session.expires_at,
+            refresh_token: session.refresh_token,
             user: {
                 id: data.user.id,
-                email: data.user.email
+                email: data.user.email,
             }
         });
 
