@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './authRoutes.js';
 import cartRoutes from './cartRoutes.js';
+import paymentRoutes from './paymentRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.use(express.json()); // Allow JSON data
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.get('/', (req, res) => {
     res.send('Backend is running!');
