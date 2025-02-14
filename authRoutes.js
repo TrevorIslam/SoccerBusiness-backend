@@ -5,23 +5,33 @@ const router = express.Router();
 
 // **Sign Up (Register New User)**
 router.post('/signup', async (req, res) => {
-    const { name, email, password } = req.body;
+    const { first_name, last_name, email, password } = req.body;
 
     console.log("Received request body:", req.body);
 
-    if (!name || !email || !password) {
-        return res.status(400).json({ error: "Name, email, and password are required" });
+    if (!first_name || !last_name || !email || !password) {
+        return res.status(400).json({ 
+            error: "First name, last name, email, and password are required" 
+        });
     }
 
     // Sign up user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+    const { data: authData, error: authError } = await supabase.auth.signUp({ 
+        email, 
+        password 
+    });
 
     if (authError) return res.status(400).json({ error: authError.message });
 
-    // Save name in users table
+    // Save first_name and last_name in users table
     const { data: userData, error: userError } = await supabase
         .from('users')
-        .insert([{ id: authData.user.id, name, email }]);
+        .insert([{ 
+            id: authData.user.id, 
+            first_name, 
+            last_name, 
+            email 
+        }]);
 
     if (userError) return res.status(400).json({ error: userError.message });
 
@@ -48,7 +58,20 @@ router.post('/signin', async (req, res) => {
 
         // Extract the session data
         const { session } = data;
-    
+
+        // Fetch user profile data from users table
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('first_name, last_name')
+            .eq('id', data.user.id)
+            .single();
+
+        if (userError) {
+            console.error('Error fetching user data:', userError);
+            return res.status(500).json({ 
+                message: 'Error fetching user profile' 
+            });
+        }
 
         res.json({
             access_token: session.access_token,
@@ -57,6 +80,8 @@ router.post('/signin', async (req, res) => {
             user: {
                 id: data.user.id,
                 email: data.user.email,
+                first_name: userData.first_name,
+                last_name: userData.last_name
             }
         });
 

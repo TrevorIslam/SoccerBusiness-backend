@@ -4,7 +4,7 @@ import authRoutes from './authRoutes.js';
 import cartRoutes from './cartRoutes.js';
 import paymentRoutes from './paymentRoutes.js';
 import coachRoutes from './coachRoutes.js';
-
+import playerRoutes from './playerRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -21,7 +21,7 @@ app.use('/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/coaches', coachRoutes);
-
+app.use('/api/players', playerRoutes);
 app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
