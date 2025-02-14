@@ -7,9 +7,9 @@ const router = express.Router();
 // Add item to cart
 router.post('/', authenticateToken, async (req, res) => {
     try {
-        const { session_type_id, coach_id, session_date, session_time, quantity, notes } = req.body;
+        const { session_type, coach_id, session_date, session_time, quantity, notes } = req.body;
         
-        if (!session_type_id || !coach_id || !session_date || !session_time) {
+        if (!session_type || !coach_id || !session_date || !session_time) {
             return res.status(400).json({ 
                 error: "Session type, coach, date and time are required" 
             });
@@ -18,7 +18,7 @@ router.post('/', authenticateToken, async (req, res) => {
         const { data, error } = await supabase
             .from('cart_items')
             .insert([{ 
-                session_type_id,
+                session_type,
                 coach_id,
                 session_date,
                 session_time,
@@ -68,6 +68,43 @@ router.delete('/:id', authenticateToken, async (req, res) => {
         res.json({ success: true });
     } catch (error) {
         console.error('Delete cart item error:', error);
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/merge', authenticateToken, async (req, res) => {
+    try {
+        const guestCartItems = req.body;
+        if (!Array.isArray(guestCartItems)) {
+            return res.status(400).json({ error: "Expected an array of cart items" });
+        }
+
+        // Format items for insertion, adding user_id to each
+        const itemsToInsert = guestCartItems.map(item => ({
+            session_type: item.session_type,
+            coach_id: item.coach_id,
+            session_date: item.session_date,
+            session_time: item.session_time,
+            quantity: item.quantity || 1,
+            notes: item.notes || '',
+            user_id: req.user.id
+        }));
+
+        // Insert all items
+        const { data, error } = await supabase
+            .from('cart_items')
+            .insert(itemsToInsert)
+            .select();
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true,
+            mergedItems: data 
+        });
+
+    } catch (error) {
+        console.error('Cart merge error:', error);
         res.status(400).json({ error: error.message });
     }
 });
