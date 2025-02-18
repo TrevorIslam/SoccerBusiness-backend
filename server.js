@@ -6,12 +6,13 @@ import paymentRoutes from './paymentRoutes.js';
 import coachRoutes from './coachRoutes.js';
 import playerRoutes from './playerRoutes.js';
 import userRoutes from './userRoutes.js';
+import coachAuthRoutes from './coachAuthRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Enable CORS for frontend access
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: 'http://localhost:5174', // Your frontend URL
     // credentials: true // Allow cookies
 }));
 
@@ -25,6 +26,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/coaches', coachRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/users', userRoutes);
+app.use('/coach-auth', coachAuthRoutes);
 app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
