@@ -27,7 +27,7 @@ router.post('/signup', async (req, res) => {
 
         if (authError) throw authError;
 
-        const { error: coachError } = await supabase
+        const { data: coachData, error: coachError } = await supabase
             .from('coaches')
             .insert([{ 
                 auth_id: authData.user.id,
@@ -39,7 +39,8 @@ router.post('/signup', async (req, res) => {
 
         res.json({ 
             message: 'Coach account created successfully, pending approval',
-            user: authData.user
+            user: authData.user,
+            profile: coachData
         });
 
     } catch (error) {
@@ -82,19 +83,6 @@ router.post('/signin', async (req, res) => {
             console.error('Error fetching coach data:', coachError);
             return res.status(401).json({ 
                 message: 'Not authorized as a coach' 
-            });
-        }
-
-        // Check coach status
-        if (coachData.status === 'pending') {
-            return res.status(403).json({
-                message: 'Your coach account is pending approval'
-            });
-        }
-
-        if (coachData.status === 'suspended') {
-            return res.status(403).json({
-                message: 'Your coach account has been suspended'
             });
         }
 

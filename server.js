@@ -7,6 +7,8 @@ import coachRoutes from './coachRoutes.js';
 import playerRoutes from './playerRoutes.js';
 import userRoutes from './userRoutes.js';
 import coachAuthRoutes from './coachAuthRoutes.js';
+import coachProfileRoutes from './coachProfileRoutes.js';
+import coachAvailabilityRoutes from './coachAvailabilityRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,6 +29,8 @@ app.use('/api/coaches', coachRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/coach-auth', coachAuthRoutes);
+app.use('/api/coaches', coachProfileRoutes);
+app.use('/api/coaches', coachAvailabilityRoutes);
 app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
